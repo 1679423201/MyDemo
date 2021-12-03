@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.hudun.mydemo.fontText.FontActivity;
 import com.hudun.mydemo.fontText.WordResource;
 import com.hudun.mydemo.myBroadcast.BroadcastActivity;
+import com.hudun.mydemo.myView.MyViewTextActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -43,6 +44,12 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, BroadcastActivity.class);
         startActivity(intent);
     }
+
+    public void turnToMyView(View view) {
+        Intent intent = new Intent(this, MyViewTextActivity.class);
+        startActivity(intent);
+    }
+
     //注册一个广播接收器，可以返回主菜单
     void registerTurnBack(){
         turnBack = new BroadcastReceiver() {
@@ -56,12 +63,10 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction("TURN_BACK");
         LocalBroadcastManager.getInstance(this).registerReceiver(turnBack, intentFilter);
     }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetMessage(WordResource resource){
         Toast.makeText(this,"EvenBus收到信息了" + resource.getMessage(),Toast.LENGTH_SHORT).show();
     }
-
     @Override
     protected void onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(turnBack);

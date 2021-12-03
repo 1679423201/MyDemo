@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="AudioCropView">
-        <attr name="ad" format="dimension"></attr>
+        <attr name="indicator_width" format="dimension"/>
+        <attr name="indicator_radius" format="dimension"/>
+        <attr name="action_width" format="dimension"/>
+        <attr name="start_time" format="integer"/>
+        <attr name="end_time" format="integer"/>
+        <attr name="playing_time" format="integer"/>
+        <attr name="cursor_width" format="dimension"/>
+        <attr name="total" format="integer"/>
+        <attr name="color" format="color"/>
+        <attr name="text_color" format="color"/>
+        <attr name="text_size" format="dimension"/>
+        <attr name="keep_in_cropArea" format="boolean"/>
+        <attr name="crop_enabled" format="boolean"/>
+        <attr name="cursor_movable" format="boolean"/>
+        <attr name="movable_rect_background" format="color"/>
     </declare-styleable>
 </resources>

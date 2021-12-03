@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyDemo">
         <activity
+            android:name=".myView.MyViewTextActivity"
+            android:exported="false" />
+        <activity
             android:name=".myBroadcast.BroadcastActivity"
             android:exported="false" />
         <activity

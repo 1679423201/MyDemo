@@ -19,4 +19,9 @@
         android:text="广播测试页"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+    <Button
+        android:onClick="turnToMyView"
+        android:text="自定义View"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </LinearLayout>
