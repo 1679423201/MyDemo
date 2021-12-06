@@ -7,10 +7,34 @@
     tools:context=".myView.MyViewTextActivity">
 
     <com.hudun.mydemo.myView.AudioCropView
+        android:id="@+id/mAudioView"
         android:layout_width="0dp"
-        android:layout_height="130dp"
+        android:layout_height="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:layout_width="162dp"
+        android:layout_height="72dp"
+        android:layout_marginBottom="136dp"
+        android:onClick="startPlay"
+        android:text="开始播放"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mAudioView"
+        app:layout_constraintVertical_bias="0.656" />
+
+    <Button
+        android:layout_width="162dp"
+        android:layout_height="72dp"
+        android:onClick="stopPlay"
+        android:text="暂停播放"
+        tools:layout_editor_absoluteX="124dp"
+        tools:layout_editor_absoluteY="579dp"
         tools:ignore="MissingConstraints" />
 </androidx.constraintlayout.widget.ConstraintLayout>
