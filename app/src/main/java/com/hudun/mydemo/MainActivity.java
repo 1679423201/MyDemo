@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -22,18 +23,13 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "DEMO_TEXT";
-    private BroadcastReceiver turnBack;
+    private BroadcastReceiver turnBack = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         registerTurnBack();
         EventBus.getDefault().register(this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
     }
     public void turnToFont(View view) {
         Intent intent = new Intent(this, FontActivity.class);
@@ -52,23 +48,56 @@ public class MainActivity extends AppCompatActivity {
 
     //注册一个广播接收器，可以返回主菜单
     void registerTurnBack(){
-        turnBack = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Toast.makeText(context,intent.getStringExtra("sd")+"广播信息",Toast.LENGTH_SHORT).show();
-            }
-        };
+        if(turnBack == null){
+            turnBack = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    Toast.makeText(context,intent.getStringExtra("sd")+"广播信息",Toast.LENGTH_SHORT).show();
+                }
+            };
 
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("TURN_BACK");
-        LocalBroadcastManager.getInstance(this).registerReceiver(turnBack, intentFilter);
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction("TURN_BACK");
+            LocalBroadcastManager.getInstance(this).registerReceiver(turnBack, intentFilter);
+        }
     }
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onGetMessage(WordResource resource){
         Toast.makeText(this,"EvenBus收到信息了" + resource.getMessage(),Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    protected void onStart() {
+        Log.d(TAG, "onStart: ");
+        super.onStart();
+    }
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume: ");
+        super.onResume();
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.d(TAG, "onRestart: ");
+        super.onRestart();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause: ");
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "onStop: ");
+        super.onStop();
+    }
+
     @Override
     protected void onDestroy() {
+        Log.d(TAG, "onDestroy: ");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(turnBack);
         EventBus.getDefault().unregister(this);
         super.onDestroy();

@@ -56,14 +56,13 @@ public class MyViewTextActivity extends AppCompatActivity {
     public void startPlay(View view) {
         if(timer == null){
             timer = new Timer("播放定时");
-            timer.scheduleAtFixedRate(timerTask, 100,100);
+            timer.scheduleAtFixedRate(timerTask, 100,10);
         }else {
             synchronized (object){
                 frag = false;
                 object.notifyAll();
             }
         }
-
     }
 
 
