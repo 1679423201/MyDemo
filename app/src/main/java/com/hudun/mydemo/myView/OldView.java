@@ -43,7 +43,7 @@ public class OldView extends View {
     private Rect cursorActionRect;
     private float indicatorRadius = 10; //进度条上面圆的半径
     private float indicatorWidth = 5;   //进度条宽度
-    private float actionRectWidth = 80;
+    private float actionRectWidth = 80; //手势响应宽度
     private float startPosition;
     private float endPosition = 10;
     private float cursorPosition;
@@ -689,7 +689,6 @@ public class OldView extends View {
         cursorActionRect.right = (int) (cursorPosition + actionRectWidth / 2f + 0.5f);
         cursorActionRect.top = movableRect.top;
         cursorActionRect.bottom = movableRect.bottom;
-
     }
 
 

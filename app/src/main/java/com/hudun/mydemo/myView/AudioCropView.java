@@ -31,11 +31,14 @@ import com.hudun.mydemo.R;
  * </pre>
  */
 public class AudioCropView extends View {
-    private int MOVE_NULL = 0;  //不移动
-    private int MOVE_LEFT = 1;  //移动左边
-    private int MOVE_RIGHT = 2; //移动右边
-    private int MOVE_ALL = 3;   //移动全部==不移动
-    private int frag = 0; //手指按下位置，变量为以上4种
+    private static final String TAG = "VIEW_TEXT";
+    private static final int IDLE = -1;//初始状态
+    private static final int STATE_MOVING_START = 0;//移动左边
+    private static final int STATE_MOVING_END = 1;//移动右边
+    private static final int STATE_MOVING_CURSOR = 2;//移动cursor
+    private static final int TEXT_INDICATOR_SPACING = 10;//文本与操作区的间距
+    private int state = IDLE; //状态指示器
+
     private int movableRectBackgroundColor = 0xfffbfafa; //背景颜色
     private Bitmap mPlayingCursorBitmap;//指示器
     private Bitmap mAudioWaveBitmap;    //波形图
@@ -46,36 +49,39 @@ public class AudioCropView extends View {
     private Rect pickedSrcRect; //选中的矩形
     private Rect pickedDescRect; //选中的矩形的位置
     private Rect movableRect; //可移动矩形
-    private Rect mSrcRect;  //定义图像大小的矩形
-    private Rect mDestRect; //定义图像位置的矩形
-    private Rect bgDestRect;
-    private Rect bgSrcRect;
+    private Rect startActionRect;   //手势响应矩形-左
+    private Rect endActionRect;     //手势响应矩形-右
+    private Rect cursorActionRect;  //手势响应矩形-播放条
 
-    private int cropBackground = 0xffff5077;
     private int movableRectBackground = 0xfffbfafa;
     private final int DEFAULT_COLOR = 0xffff5077;
     private final int DEFAULT_COLOR_PRESSED = 0xffAA3751;
     private int color = DEFAULT_COLOR;//颜色
-    private int total = 100000;
+    private int colorPressed = DEFAULT_COLOR_PRESSED;//按下颜色
+    private int total = 100000; //播放总时间
     private int startTime = 0, endTime = 100000;//开始时间,结束时间
     private int playingTime = 0;//正在播放的指示器
 
+    private float actionRectWidth = 80; //手势响应宽度
     private float currentTime = 0f;  //当前时间
     private float startPosition , endPosition, cursorPosition;;  //开始位置,结束位置,当前位置
-    private float cursorWidth = 30; //进度条左右的空白宽度
-    private float indicatorRadius = 10; //进度条上面圆的半径
-    private float indicatorWidth = 5;   //进度条宽度
+    private float cursorWidth = 20; //进度条宽度
+    private float indicatorRadius = 10; //剪辑条上面圆的半径
+    private float indicatorWidth = 5;   //剪辑条宽度
     private float textHeight = 0;
-    private static final int TEXT_INDICATOR_SPACING = 10;//文本与操作区的间距
 
-    private static final String TAG = "VIEW_TEXT";
+    private PlayingTimeChangeListener playingTimeChangeListener;
+    private CropTimeChangeListener cropTimeChangeListener;
 
     /***
      * 这里写一下剪辑的背景控制逻辑
      *
      */
 
-
+    /***
+     * ------------------------------------------------------------------------------------------------------------------------
+     * 这里是一些初始化和系统方法
+     */
     private void init(@Nullable AttributeSet attrs){
             //从资源中获取Bitmap对象
             Bitmap bitmapMain = BitmapFactory.decodeResource(getResources(), R.drawable.ic_audio_wave);
@@ -89,11 +95,68 @@ public class AudioCropView extends View {
 
             pickedSrcRect = new Rect();
             pickedDescRect = new Rect();
+            startActionRect = new Rect();
+            endActionRect = new Rect();
+            cursorActionRect = new Rect();
+    }
+    @Override
+    protected void onDraw(Canvas canvas) {
+        Log.d(TAG, " onDraw: ");
+        drawBackground(canvas);
+        drawPickedArea(canvas);
+        drawPlayingCursor(canvas);
+        drawStartIndicator(canvas);
+        drawEndIndicator(canvas);
+    }
+    /***
+     *  手指触摸事件，主要用于进度条和剪辑条的调节
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()){
+            /***
+             * 点击下去的瞬间，这里要做的事情有：
+             * 1：判断点击的是左条，右条，还是播放条
+             * 2：根据点击的地方为state赋相应的值
+             */
+            case MotionEvent.ACTION_DOWN:{
+                float x = event.getX();
+                float y = event.getY();
+                if(startActionRect.contains((int)x, (int)y)){
+                    state = STATE_MOVING_START;
+                }
+                break;
+            }
+            case MotionEvent.ACTION_MOVE:{
+                break;
+            }
+            case MotionEvent.ACTION_UP:{
+                break;
+            }
+        }
+        return true;
     }
 
 
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        Log.d(TAG, " onChange: ");
+        mWidth = w;
+        mHeight = h;
+        resizeMovableRect();
+        convertValueToPosition();
+        convertPlayingTimeToCursorPosition();
+        refreshPickedRect();
+        refreshCropActionRect();
+        refreshCursorActionRect();
+    }
 
-
+    /***
+     * ------------------------------------------------------------------------------------------------------------------------
+     * 这里是内部使用的方法
+     */
     /***
      * 绘制图形背景
      * 包括纯色背景和波形图
@@ -102,7 +165,7 @@ public class AudioCropView extends View {
     public void drawBackground(Canvas canvas) {
         mPaint.setColor(movableRectBackground);
         mPaint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(0, movableRect.top, mWidth, movableRect.top,mPaint);
+        canvas.drawRect(0, movableRect.top, mWidth, movableRect.bottom,mPaint);
         canvas.drawBitmap(mAudioWaveBitmap
                 , new Rect(0,0,mAudioWaveBitmap.getWidth(),mAudioWaveBitmap.getHeight())
                 , movableRect, null);
@@ -118,11 +181,7 @@ public class AudioCropView extends View {
                 movableRect.top,
                 (int) (cursorPosition + cursorWidth / 2f + 0.5f),
                 movableRect.bottom);
-        Paint paint = new Paint();
-        paint.setColor(Color.RED);
-        canvas.drawBitmap(mPlayingCursorBitmap, srcRect, dstRect, paint);
-//        Rect srcRect = new Rect(0, 0, mPlayingCursorBitmap.getWidth(), mPlayingCursorBitmap.getHeight());
-//        canvas.drawBitmap(mPlayingCursorBitmap, srcRect, pickedDescRect, null);
+        canvas.drawBitmap(mPlayingCursorBitmap, srcRect, dstRect, null);
     }
 
     /***
@@ -141,15 +200,10 @@ public class AudioCropView extends View {
      * todo:3.剪辑条可调节 √
      * -2021-12-06
      */
-
-
     /***
-     * 播放条开始播放
+     * todo:1.重新添加剪辑条
+     * todo:2.设置外部监听
      */
-    public void startPlaying(float time){
-        cursorPosition ++;
-        postInvalidate();
-    }
 
     /***
      * 刷新剪辑框选中区域
@@ -166,23 +220,30 @@ public class AudioCropView extends View {
         pickedDescRect.right = (int) (endPosition + 0.5f);
         pickedDescRect.top = movableRect.top;
         pickedDescRect.bottom = movableRect.bottom;
-
     }
-    /***
-     * 设置剪辑进度条
-     * @param canvas
+    /**
+     * 刷新手势响应位置
      */
-    public void setClipBar(Canvas canvas){
-        mPaint.setColor(Color.GREEN);
-        mPaint.setAlpha(99);
-        canvas.drawRect(pickedSrcRect.left, 0, pickedSrcRect.left+20, mHeight, mPaint);
-        mPaint.setColor(Color.GREEN);
-        canvas.drawCircle(pickedSrcRect.left+10, 20, 20, mPaint);
-        mPaint.setColor(Color.GREEN);
-        canvas.drawRect(pickedSrcRect.right-20, 0, pickedSrcRect.right, mHeight, mPaint);
-        canvas.drawCircle(pickedSrcRect.right-10, mHeight-20, 20, mPaint);
+    private void refreshCropActionRect() {
+        startActionRect.left = (int) (startPosition - actionRectWidth / 2f + 0.5f);
+        startActionRect.right = (int) (startPosition + actionRectWidth / 2f + 0.5f);
+        startActionRect.top = 0;
+        startActionRect.bottom = movableRect.bottom;
+        endActionRect.left = (int) (endPosition - actionRectWidth / 2f + 0.5f);
+        endActionRect.right = (int) (endPosition + actionRectWidth / 2f + 0.5);
+        endActionRect.top = movableRect.top;
+        endActionRect.bottom = mHeight;
     }
 
+    /**
+     * 刷新指针响应位置
+     */
+    private void refreshCursorActionRect() {
+        cursorActionRect.left = (int) (cursorPosition - actionRectWidth / 2f + 0.5f);
+        cursorActionRect.right = (int) (cursorPosition + actionRectWidth / 2f + 0.5f);
+        cursorActionRect.top = movableRect.top;
+        cursorActionRect.bottom = movableRect.bottom;
+    }
     /***
      *  绘制选中区域
      * @param canvas
@@ -194,39 +255,45 @@ public class AudioCropView extends View {
         canvas.drawRect(pickedDescRect, mPaint);
         canvas.drawBitmap(mAudioWaveBitmap, pickedSrcRect, pickedDescRect, filterPaint);
     }
-
-
-
+    /***
+     * todo setColorFilter 总结
+     */
 
     /***
-     *  手指触摸事件，主要用于进度条调节
-     * @param event
-     * @return
+     *  绘制剪辑开始条
+     * @param canvas
      */
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        return true;
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        Log.d(TAG, " onDraw: ");
-        drawBackground(canvas);
-        drawPickedArea(canvas);
-        drawPlayingCursor(canvas);
-        setClipBar(canvas);
-    }
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        Log.d(TAG, " onChange: ");
-        mWidth = w;
-        mHeight = h;
-        resizeMovableRect();
-        convertValueToPosition();
-        convertPlayingTimeToCursorPosition();
-        refreshPickedRect();
+    private void drawStartIndicator(Canvas canvas) {
+        mPaint.setStrokeWidth(indicatorWidth); //设置画笔粗细
+        mPaint.setStyle(Paint.Style.FILL);
+        float radius = state == STATE_MOVING_START ? indicatorRadius + 5 : indicatorRadius;
+        int color = state == STATE_MOVING_START ? colorPressed : this.color;
+        mPaint.setColor(color);
+        canvas.drawRoundRect(startPosition - indicatorWidth/2f,
+                (float) getPaddingTop() + radius, startPosition + indicatorWidth/2f,
+                (float) movableRect.bottom, indicatorRadius,indicatorWidth,
+                mPaint);
+        canvas.drawCircle(startPosition, getPaddingTop()+radius, indicatorRadius, mPaint);
 
     }
+    /***
+     *  绘制剪辑结束条
+     * @param canvas
+     */
+    private void drawEndIndicator(Canvas canvas) {
+        mPaint.setStrokeWidth(indicatorWidth); //设置画笔粗细
+        mPaint.setStyle(Paint.Style.FILL);
+        float radius = state == STATE_MOVING_END ? indicatorRadius + 5 : indicatorRadius;
+        int color = state == STATE_MOVING_END ? colorPressed : this.color;
+        mPaint.setColor(color);
+        canvas.drawRoundRect(endPosition + indicatorWidth/2f,
+                (float) getPaddingTop() +  radius, endPosition - indicatorWidth/2f,
+                (float) movableRect.bottom, indicatorRadius,indicatorWidth,
+                mPaint);
+        canvas.drawCircle(endPosition, getPaddingTop()+movableRect.bottom + radius, indicatorRadius, mPaint);
+    }
+
+
     /**
      * 将值转化为位置
      */
@@ -252,6 +319,22 @@ public class AudioCropView extends View {
     private void convertCursorPositionToPlayingTime() {
         playingTime = (int) (total * ((cursorPosition - movableRect.left) / movableRect.width()) + 0.5f);
     }
+    /***
+     * ------------------------------------------------------------------------------------------------------------------------
+     * 这里是暴露给外部的方法和构造方法
+     */
+    /***
+     * 播放条开始播放
+     */
+    public void startPlaying(float time){
+        startPosition++;
+        cursorPosition ++;
+        refreshPickedRect();
+        postInvalidate();
+    }
+    public void setPlayingTime(){
+        this.playingTime = playingTime;
+    }
 
     public AudioCropView(Context context) {
         super(context);
@@ -268,9 +351,32 @@ public class AudioCropView extends View {
         init(attrs);
     }
 
-
-    public interface ControlPlaying{
-        void startPlaying();
+    /***
+     * 接口规则：
+     * 1.外部类监听本VIew相关事件
+     * 2.要监听的事件有播放事件和剪辑事件
+     * 3.播放事件-开始，移动中，移动结束，播放结束
+     * 4.剪辑事件-点击剪辑条，移动剪辑条，放下剪辑条（分前后剪辑条）
+     */
+    public interface PlayingTimeChangeListener{
+        void onStartMoving();   //开始自动移动
+        void onToMoving(int position);  //开始拖动
+        void onToMoved(int position);   //拖动结束
+        void onEndMoving();     //到终点了
+    }
+    public interface CropTimeChangeListener{
+        void onClickLeft(int position); //点击左
+        void onLeftChanging(int position);
+        void onLeftChanged(int position);
+        void onClickRight(int position);//点击右
+        void onRightChanging(int position);
+        void onRightChanged(int position);
+    }
+    public void setPlayingTimeChangeListener(PlayingTimeChangeListener listener){
+        this.playingTimeChangeListener = listener;
+    }
+    public void setCropTimeChangeListener(CropTimeChangeListener listener){
+        this.cropTimeChangeListener = listener;
     }
 }
 
