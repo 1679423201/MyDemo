@@ -7,6 +7,8 @@
     tools:context=".myView.MyViewTextActivity">
 
     <com.hudun.mydemo.myView.AudioCropView
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
         android:id="@+id/mAudioView"
         android:layout_width="0dp"
         android:layout_height="100dp"
@@ -14,6 +16,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:color="#202CCD"
+        app:movable_rect_background="#BA8B8B"
         tools:ignore="MissingConstraints" />
 
     <Button
