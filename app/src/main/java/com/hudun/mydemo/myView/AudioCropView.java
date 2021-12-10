@@ -1,12 +1,11 @@
 package com.hudun.mydemo.myView;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -91,7 +90,7 @@ public class AudioCropView extends View {
      */
     private void init(@Nullable AttributeSet attrs){
         if(attrs != null){
-            TypedArray array = getContext().obtainStyledAttributes(attrs,R.styleable.AudioCropView);
+            @SuppressLint("Recycle") TypedArray array = getContext().obtainStyledAttributes(attrs,R.styleable.AudioCropView);
             indicatorWidth = array.getDimension(R.styleable.AudioCropView_indicator_width, 5);
             indicatorRadius = array.getDimension(R.styleable.AudioCropView_indicator_radius, 10);
             actionRectWidth = array.getDimension(R.styleable.AudioCropView_action_width, 80);
@@ -102,6 +101,13 @@ public class AudioCropView extends View {
             total = array.getInt(R.styleable.AudioCropView_total, 100000);
             color = array.getColor(R.styleable.AudioCropView_color, DEFAULT_COLOR);
             movableRectBackground = array.getColor(R.styleable.AudioCropView_movable_rect_background, 0xfffbfafa);
+
+            if(startTime<0) startTime = 0;
+            else if (startTime > total) startTime = total;
+            if(endTime<startTime) endTime = startTime;
+            else if (endTime > total) endTime = total;
+            if(playingTime < 0) playingTime = 0;
+            else if(playingTime > total) playingTime = total;
         }
             //从资源中获取Bitmap对象
             Bitmap bitmapMain = BitmapFactory.decodeResource(getResources(), R.drawable.ic_audio_wave);
@@ -152,12 +158,12 @@ public class AudioCropView extends View {
                     Log.d(TAG, "onTouchEvent: left");
                     invalidate();
                     if(cropTimeChangeListener != null){
-                        cropTimeChangeListener.onClickLeft((int)startPosition);
+                        cropTimeChangeListener.onClickLeft();
                     }
                 }else if(endActionRect.contains((int)lastX, y)){
                     Log.d(TAG, "onTouchEvent: right");
                     if(cropTimeChangeListener != null){
-                        cropTimeChangeListener.onClickRight((int)endPosition);
+                        cropTimeChangeListener.onClickRight();
                     }
                     state = STATE_MOVING_END;
                     invalidate();
@@ -165,7 +171,7 @@ public class AudioCropView extends View {
                 else if(cursorActionRect.contains((int)lastX, y)){
                     Log.d(TAG, "onTouchEvent: mid");
                     if(playingTimeChangeListener != null){
-                        playingTimeChangeListener.onClickMove((int)currentTime);
+                        playingTimeChangeListener.onStartMoving();
                     }
                     state = STATE_MOVING_CURSOR;
                 }
@@ -192,6 +198,9 @@ public class AudioCropView extends View {
                         convertPositionToValue();
                         refreshPickedRect();
                         refreshCropActionRect();
+                        if(cropTimeChangeListener != null){
+                            cropTimeChangeListener.onLeftChanging(startTime);
+                        }
                         invalidate();
                         break;
                     }
@@ -206,6 +215,9 @@ public class AudioCropView extends View {
                         convertPositionToValue();
                         refreshPickedRect();
                         refreshCropActionRect();
+                        if(cropTimeChangeListener != null){
+                            cropTimeChangeListener.onRightChanging(endTime);
+                        }
                         invalidate();
                         break;
                     }
@@ -218,6 +230,9 @@ public class AudioCropView extends View {
                         }
                         refreshCursorActionRect();
                         convertCursorPositionToPlayingTime();
+                        if(playingTimeChangeListener != null){
+                            playingTimeChangeListener.onToMoving(playingTime);
+                        }
                         invalidate();
                     }
                 }
@@ -231,9 +246,14 @@ public class AudioCropView extends View {
                     }
                     cursorPosition = startPosition;
                 }
-                if (state == STATE_MOVING_END) {
+                else if (state == STATE_MOVING_END) {
                     if(cropTimeChangeListener != null){
                         cropTimeChangeListener.onRightChanged((int)endPosition);
+                    }
+                }
+                else if(state == STATE_MOVING_CURSOR){
+                    if(playingTimeChangeListener != null){
+                        playingTimeChangeListener.onToMoved(playingTime);
                     }
                 }
                 state = IDLE;
@@ -458,9 +478,6 @@ public class AudioCropView extends View {
         refreshPickedRect();
         postInvalidate();
     }
-    public void setPlayingTime(){
-        this.playingTime = playingTime;
-    }
 
     public AudioCropView(Context context) {
         super(context);
@@ -478,6 +495,59 @@ public class AudioCropView extends View {
     }
 
     /***
+     * 暴露给外部的方法
+     * 1.调整播放进度条，操作-playingTime变量-setPlayingTime
+     * 2.调整剪辑头，操作-startTime变量-setStartTime
+     * 3.调整剪辑尾，操作-endTime变量-setEndTime
+     * 4.设置播放总时间，操作-total变量-setTotal
+     * 5.设置一些get方法，主要是time相关
+     */
+
+    public void setPlayingTime(int playingTime){
+        this.playingTime = playingTime;
+        convertPlayingTimeToCursorPosition();
+        refreshCursorActionRect();
+        postInvalidate();
+    }
+
+    public void setStartTime(int startTime){
+        this.startTime = startTime;
+        convertValueToPosition();
+        refreshCropActionRect();
+        postInvalidate();
+    }
+    public void setEndTime(int endTime){
+        this.endTime = endTime;
+        convertValueToPosition();
+        refreshCropActionRect();
+        postInvalidate();
+    }
+    public void setTotal(int total){
+        this.total = total;
+        convertValueToPosition();
+        convertPlayingTimeToCursorPosition();
+        refreshCropActionRect();
+        refreshPickedRect();
+        postInvalidate();
+    }
+
+    public int getPlayingTime() {
+        return playingTime;
+    }
+
+    public int getStartTime() {
+        return startTime;
+    }
+
+    public int getEndTime() {
+        return endTime;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    /***
      * 接口规则：
      * 1.外部类监听本VIew相关事件
      * 2.要监听的事件有播放事件和剪辑事件
@@ -486,16 +556,15 @@ public class AudioCropView extends View {
      */
     public interface PlayingTimeChangeListener{
         void onStartMoving();   //开始自动移动
-        void onClickMove(int position); //点击
         void onToMoving(int position);  //开始拖动
         void onToMoved(int position);   //拖动结束
         void onEndMoving();     //到终点了
     }
     public interface CropTimeChangeListener{
-        void onClickLeft(int position); //点击左
+        void onClickLeft(); //点击左
         void onLeftChanging(int position);
         void onLeftChanged(int position);
-        void onClickRight(int position);//点击右
+        void onClickRight();//点击右
         void onRightChanging(int position);
         void onRightChanged(int position);
     }

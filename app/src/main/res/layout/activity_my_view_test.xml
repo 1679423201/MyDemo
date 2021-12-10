@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".myView.MyViewTextActivity">
+
+    <com.hudun.mydemo.myView.AudioCropView
+        android:layout_marginTop="50dp"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:id="@+id/mAudioView"
+        android:layout_width="match_parent"
+        android:layout_height="100dp" />
+
+    <SeekBar
+        android:id="@+id/sb_control"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"/>
+    <Button
+        android:layout_marginTop="20dp"
+        android:layout_width="162dp"
+        android:layout_height="72dp"
+        android:layout_marginBottom="36dp"
+        android:onClick="startPlay"
+        android:text="开始播放" />
+
+    <Button
+        android:layout_width="162dp"
+        android:layout_height="72dp"
+        android:onClick="stopPlay"
+        android:text="暂停播放" />
+</LinearLayout>
