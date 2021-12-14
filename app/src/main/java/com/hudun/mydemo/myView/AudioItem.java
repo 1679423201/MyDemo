@@ -12,12 +12,12 @@ import java.io.Serializable;
  *      @Version :1.0
  * </pre>
  */
-public class MediaItem implements Serializable {
-    private String name;
-    private long size;
-    private long duration;
-    private String data;
-    private String artist;
+public class AudioItem implements Serializable {
+    private String name;    //名字
+    private long size;      //大小
+    private long duration;  //时长
+    private String data;    //日期
+    private String artist;  //作者
 
     public String getName() {
         return name;

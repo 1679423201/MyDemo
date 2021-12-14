@@ -2,12 +2,14 @@ package com.hudun.mydemo.myView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.ContentResolver;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.media.MediaDescription;
 import android.media.MediaPlayer;
-import android.media.browse.MediaBrowser;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,9 +20,10 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.hudun.mydemo.R;
+import com.hudun.mydemo.app.MyApplication;
+import com.hudun.mydemo.untils.AudioUntil;
 
 import java.util.ArrayList;
-import java.util.Timer;
 
 public class MyViewTextActivity extends AppCompatActivity {
 
@@ -28,7 +31,7 @@ public class MyViewTextActivity extends AppCompatActivity {
     private static final String TAG = "VIEW_TEXT";
     private SeekBar seekBar;
     private MediaPlayer mediaPlayer;
-    private ArrayList<MediaItem> items = null;
+    private ArrayList<AudioItem> itemArrayList = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,56 +74,38 @@ public class MyViewTextActivity extends AppCompatActivity {
 
 
     public void startPlay(View view) {
+        requestPower();
+        AudioUntil.seekAudios();
+
     }
 
 
     public void stopPlay(View view) {
     }
 
-    private void getDataForLocal(){
-        items = new ArrayList<MediaItem>();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ContentResolver resolver = getContentResolver();
-                Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-                String[] obj = {
-                        MediaStore.Audio.Media.DISPLAY_NAME, //音频文件在SD卡中的名称
-                        MediaStore.Audio.Media.DURATION,    //音频总时长
-                        MediaStore.Audio.Media.SIZE,        //音频的文件大小
-                        MediaStore.Audio.Media.DATA,        //音频的绝对地址
-                        MediaStore.Audio.Media.ARTIST,      //歌曲的演唱者
-                };
-                Cursor cursor = resolver.query(uri, obj, null, null, null);
-                if(cursor != null){
-                    while (cursor.moveToNext()){
-                        MediaItem item = new MediaItem();
-                        item.setName(cursor.getString(0));
-                        item.setDuration(cursor.getLong(1));
-                        item.setSize(cursor.getLong(2));
-                        item.setData(cursor.getString(3));
-                        item.setArtist(cursor.getString(4));
-                    }
-                    cursor.close();
-                }
-                handler.sendEmptyMessage(0);
+
+
+    /***
+     * 权限申请
+     */
+    public void requestPower(){
+        //判断是否已经赋予权限
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED){
+            //判断是否被用户拒绝过权限
+            if(ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)){
+
             }
-        }).start();
-    }
-    private Handler handler = new Handler(){
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            if(msg.what == 0){
-                if (items != null && items.size() > 0) {
-                    //进行相关操作
-                } else {
-                    Toast.makeText(MyViewTextActivity.this, "没有找到视频", Toast.LENGTH_SHORT);
-                }
+            else {
+                //申请权限
+                ActivityCompat.requestPermissions(this,
+                        new String[]{
+                                Manifest.permission.READ_EXTERNAL_STORAGE
+                        }, 1);
             }
         }
-    };
-
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
