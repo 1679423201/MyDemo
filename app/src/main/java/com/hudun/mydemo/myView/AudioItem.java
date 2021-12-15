@@ -16,7 +16,7 @@ public class AudioItem implements Serializable {
     private String name;    //名字
     private long size;      //大小
     private long duration;  //时长
-    private String data;    //日期
+    private String path;    //路径
     private String artist;  //作者
 
     public String getName() {
@@ -43,12 +43,12 @@ public class AudioItem implements Serializable {
         this.duration = duration;
     }
 
-    public String getData() {
-        return data;
+    public String getPath() {
+        return path;
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public String getArtist() {
@@ -62,7 +62,7 @@ public class AudioItem implements Serializable {
     @Override
     public String toString() {
         return "MediaItem [name=" + name + ", size=" + size + ", duration="
-                + duration + ", data=" + data + ", artist=" + artist + "]";
+                + duration + ", data=" + path + ", artist=" + artist + "]";
     }
 
 }

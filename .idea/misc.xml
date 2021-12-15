@@ -4,11 +4,17 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/drawable/ic_launcher_background.xml" value="0.23425925925925925" />
+        <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/drawable/ic_radio_check.xml" value="0.24114583333333334" />
+        <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/drawable/ic_radio_unchecked.xml" value="0.24114583333333334" />
+        <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/drawable/select_ic.xml" value="0.24114583333333334" />
+        <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/drawable/toolbar_radius.xml" value="0.23125" />
+        <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/activity_audio_pick.xml" value="0.33748271092669435" />
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/activity_broadcasr.xml" value="0.1802536231884058" />
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/activity_font.xml" value="0.18795289855072464" />
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/activity_main.xml" value="0.18795289855072464" />
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/activity_my_view_test.xml" value="0.19972826086956522" />
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/activity_my_view_text.xml" value="0.25" />
+        <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/audio_pick_item.xml" value="0.25" />
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/audio_pick_view.xml" value="0.19202898550724637" />
       </map>
     </option>

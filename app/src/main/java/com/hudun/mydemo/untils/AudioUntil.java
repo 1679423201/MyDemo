@@ -1,15 +1,9 @@
 package com.hudun.mydemo.untils;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.hudun.mydemo.app.MyApplication;
 import com.hudun.mydemo.myView.AudioItem;
@@ -54,6 +48,7 @@ public class AudioUntil {
                 Log.d(TAG, "seekAudios:  dataIndex = " + dataIndex);
                 AudioItem item = new AudioItem();
                 item.setName(cursor.getString(nameIndex));
+                item.setPath(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)));
                 if (cursor.getString(nameIndex) == null) {
                     Log.d(TAG, "seekAudios: 获取为空");
                 }else Log.d(TAG, "seekAudios:  == "+cursor.getString(nameIndex) );

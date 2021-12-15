@@ -37,7 +37,6 @@ public class MyViewTextActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_view_test);
-
         audioCropView = findViewById(R.id.mAudioView);
         seekBar = findViewById(R.id.sb_control);
         seekBar.setMax(audioCropView.getTotal());
@@ -74,9 +73,7 @@ public class MyViewTextActivity extends AppCompatActivity {
 
 
     public void startPlay(View view) {
-        requestPower();
         AudioUntil.seekAudios();
-
     }
 
 
@@ -85,27 +82,7 @@ public class MyViewTextActivity extends AppCompatActivity {
 
 
 
-    /***
-     * 权限申请
-     */
-    public void requestPower(){
-        //判断是否已经赋予权限
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) !=
-                PackageManager.PERMISSION_GRANTED){
-            //判断是否被用户拒绝过权限
-            if(ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)){
 
-            }
-            else {
-                //申请权限
-                ActivityCompat.requestPermissions(this,
-                        new String[]{
-                                Manifest.permission.READ_EXTERNAL_STORAGE
-                        }, 1);
-            }
-        }
-    }
     @Override
     protected void onDestroy() {
         super.onDestroy();

@@ -8,5 +8,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="toolbar_bg_color">#DE4444</color>
+    <color name="toolbar_title_color">#FFFFFF</color>
     <color name="cropBackground">#B0F57F</color>
+    <color name="md_red_a200_color_code">#ff5177</color>
 </resources>
