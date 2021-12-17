@@ -1,5 +1,8 @@
 package com.hudun.mydemo.myView;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 
 /**
@@ -12,12 +15,36 @@ import java.io.Serializable;
  *      @Version :1.0
  * </pre>
  */
-public class AudioItem implements Serializable {
+public class AudioItem implements Serializable, Parcelable {
     private String name;    //名字
     private long size;      //大小
-    private long duration;  //时长
+    private int duration;  //时长
     private String path;    //路径
     private String artist;  //作者
+
+    public AudioItem() {
+
+    }
+    public AudioItem(Parcel in) {
+        name = in.readString();
+        size = in.readLong();
+        duration = in.readInt();
+        path = in.readString();
+        artist = in.readString();
+    }
+
+
+    public static final Creator<AudioItem> CREATOR = new Creator<AudioItem>() {
+        @Override
+        public AudioItem createFromParcel(Parcel in) {
+            return new AudioItem(in);
+        }
+
+        @Override
+        public AudioItem[] newArray(int size) {
+            return new AudioItem[size];
+        }
+    };
 
     public String getName() {
         return name;
@@ -35,11 +62,11 @@ public class AudioItem implements Serializable {
         this.size = size;
     }
 
-    public long getDuration() {
+    public int getDuration() {
         return duration;
     }
 
-    public void setDuration(long duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
     }
 
@@ -65,4 +92,17 @@ public class AudioItem implements Serializable {
                 + duration + ", data=" + path + ", artist=" + artist + "]";
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeLong(size);
+        dest.writeInt(duration);
+        dest.writeString(path);
+        dest.writeString(artist);
+    }
 }

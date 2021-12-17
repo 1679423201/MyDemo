@@ -524,6 +524,9 @@ public class AudioCropView extends View {
     }
     public void setTotal(int total){
         this.total = total;
+        if(movableRect == null){
+            return;
+        }
         convertValueToPosition();
         convertPlayingTimeToCursorPosition();
         refreshCropActionRect();

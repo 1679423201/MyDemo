@@ -23,6 +23,7 @@ import java.util.List;
  */
 public class AudioUntil {
     private static final String TAG = "AUDIO_TEXT";
+    public static final String MUSIC_FRAG = "MUSIC_F"; //音乐传输标识
     public static List<AudioItem> seekAudios(){
         List<AudioItem> audioItemList = new ArrayList<>();
         //数据表的Uri
@@ -38,28 +39,16 @@ public class AudioUntil {
         String order = MediaStore.Files.FileColumns.SIZE+"DESC";
         Cursor cursor = MyApplication.getContext().getContentResolver().query(audioUri, null, null, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
         if(cursor != null){
-            Log.d(TAG, "seekAudios: 不是空");
             int nameIndex = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
-            System.out.println(nameIndex);
-            int dataIndex = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
-            Log.d(TAG, "seekAudios: "+ cursor.getCount());
             while (cursor.moveToNext()){
-                Log.d(TAG, "seekAudios:  nameIndex = " + nameIndex);
-                Log.d(TAG, "seekAudios:  dataIndex = " + dataIndex);
                 AudioItem item = new AudioItem();
                 item.setName(cursor.getString(nameIndex));
                 item.setPath(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)));
-                if (cursor.getString(nameIndex) == null) {
-                    Log.d(TAG, "seekAudios: 获取为空");
-                }else Log.d(TAG, "seekAudios:  == "+cursor.getString(nameIndex) );
-                System.out.println(cursor.getString(nameIndex));
-                Log.d(TAG, "seekAudios: "+ item.getName());
+                item.setDuration(cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)));
                 audioItemList.add(item);
             }
-            Log.d(TAG, "seekAudios:  list long ="+audioItemList.size());
             cursor.close();
         }
-        Log.d(TAG, "seekAudios: 是空");
         return audioItemList;
     }
 
