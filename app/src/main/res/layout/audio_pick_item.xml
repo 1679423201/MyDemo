@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/re_audio_pick"
     android:layout_marginTop="10dp"
     android:layout_width="match_parent"
     android:orientation="horizontal"
@@ -20,19 +20,14 @@
         android:id="@+id/checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
         android:layout_centerInParent="true"
-        android:layout_toStartOf="@+id/bt_turn_play"
+        android:layout_marginRight="20dp"
         android:button="@drawable/selector_ic_radio"
+        android:clickable="false"
         android:enabled="true"
         app:buttonTint="@color/md_red_a200_color_code" />
 
-    <Button
-        android:id="@+id/bt_turn_play"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="10dp"
-        android:background="@drawable/play" />
+
 
 </RelativeLayout>

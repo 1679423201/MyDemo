@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.hudun.mydemo.baserecycle.BaseTextActivity;
 import com.hudun.mydemo.fontText.FontActivity;
 import com.hudun.mydemo.fontText.WordResource;
 import com.hudun.mydemo.myBroadcast.BroadcastActivity;
@@ -54,6 +55,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void turnToBaseRecycle(View view) {
+        Intent intent = new Intent(this, BaseTextActivity.class);
+        startActivity(intent);
+    }
+
+
     //注册一个广播接收器，可以返回主菜单
     void registerTurnBack(){
         if(turnBack == null){
@@ -73,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
     public void onGetMessage(WordResource resource){
         Toast.makeText(this,"EvenBus收到信息了" + resource.getMessage(),Toast.LENGTH_SHORT).show();
     }
+
+
 
 
     @Override
@@ -111,4 +120,5 @@ public class MainActivity extends AppCompatActivity {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
+
 }

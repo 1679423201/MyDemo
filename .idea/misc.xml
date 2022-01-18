@@ -11,6 +11,7 @@
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/drawable/selector_ic_radio.xml" value="0.2992849846782431" />
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/drawable/toolbar_radius.xml" value="0.23125" />
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/activity_audio_pick.xml" value="0.33748271092669435" />
+        <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/activity_base_text.xml" value="0.3020833333333333" />
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/activity_broadcasr.xml" value="0.1802536231884058" />
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/activity_font.xml" value="0.18795289855072464" />
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/activity_main.xml" value="0.18795289855072464" />
@@ -18,6 +19,8 @@
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/activity_my_view_text.xml" value="0.25" />
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/audio_pick_item.xml" value="0.25" />
         <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/audio_pick_view.xml" value="0.19202898550724637" />
+        <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/item_base_level_0.xml" value="0.16197916666666667" />
+        <entry key="..\:/Android/workplace/localProjects/MyDemo/app/src/main/res/layout/item_base_level_1.xml" value="0.25" />
       </map>
     </option>
   </component>

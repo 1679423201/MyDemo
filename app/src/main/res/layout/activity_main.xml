@@ -24,4 +24,9 @@
         android:text="自定义View"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+    <Button
+        android:onClick="turnToBaseRecycle"
+        android:text="折叠列表"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

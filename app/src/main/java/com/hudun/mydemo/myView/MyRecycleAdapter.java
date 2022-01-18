@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hudun.mydemo.R;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -41,10 +43,10 @@ public class MyRecycleAdapter extends RecyclerView.Adapter<MyRecycleAdapter.View
     MediaPlayer player = null;
     private int currentAudio = -1;
     private int frag = -1;
-    private CheckBox checkedBox = null;
+    private HashMap<String, Integer> map;
     public MyRecycleAdapter(List<AudioItem> list,MediaPlayer player){
-
         audioItemList = list;
+        map = new HashMap();
         this.player = player;
     }
     @NonNull
@@ -58,49 +60,10 @@ public class MyRecycleAdapter extends RecyclerView.Adapter<MyRecycleAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.audioName.setText(audioItemList.get(position).getName());
-        int data = position;
-        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                /***
-                 *设置为单选框，采用frag标记是否有其他已选择的按钮
-                 * 若没有则为-1，有则为其对应的position
-                 */
-                if(isChecked){
-                    if (frag != -1) {
-                        checkedBox.setChecked(false);
-                        checkedBox.setClickable(true);
-                    }
-                    checkedBox = (CheckBox) buttonView;
-                    buttonView.setClickable(false);
-                    frag = data;
-                }
-            }
-        });
-
-        holder.turnPlay.setOnClickListener(new View.OnClickListener() {
+        holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentAudio == data){
-                    if(player.isPlaying()){
-                        player.pause();
-                    }
-                    else {
-                        player.start();
-                    }
-                }
-                else {
-                    try {
-                        player.reset();
-                        player.setDataSource(audioItemList.get(data).getPath());
-                        player.prepare();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    player.start();
-                    currentAudio = data;
-                }
-                //播放
+                holder.checkBox.setChecked(true);
             }
         });
     }
@@ -116,13 +79,13 @@ public class MyRecycleAdapter extends RecyclerView.Adapter<MyRecycleAdapter.View
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView audioName;
-        Button turnPlay;
+        RelativeLayout relativeLayout;
         CheckBox checkBox;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             audioName = itemView.findViewById(R.id.tv_audio_name);
-            turnPlay = itemView.findViewById(R.id.bt_turn_play);
             checkBox = itemView.findViewById(R.id.checkbox);
+            relativeLayout = itemView.findViewById(R.id.re_audio_pick);
         }
     }
 }
