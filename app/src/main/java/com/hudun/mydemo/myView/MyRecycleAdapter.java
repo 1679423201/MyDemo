@@ -24,6 +24,7 @@ import com.hudun.mydemo.R;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <pre>
@@ -43,10 +44,12 @@ public class MyRecycleAdapter extends RecyclerView.Adapter<MyRecycleAdapter.View
     MediaPlayer player = null;
     private int currentAudio = -1;
     private int frag = -1;
-    private HashMap<String, Integer> map;
+    private HashMap<Integer, Boolean> map = new HashMap();
     public MyRecycleAdapter(List<AudioItem> list,MediaPlayer player){
         audioItemList = list;
-        map = new HashMap();
+        for (int i = 0; i < list.size(); i++) {
+            map.put(i, false);
+        }
         this.player = player;
     }
     @NonNull
@@ -60,12 +63,21 @@ public class MyRecycleAdapter extends RecyclerView.Adapter<MyRecycleAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.audioName.setText(audioItemList.get(position).getName());
+        int p = position;
         holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                holder.checkBox.setChecked(true);
+                for(Map.Entry<Integer, Boolean> entry : map.entrySet()){
+                    entry.setValue(false);
+                }
+                map.put(p, true);
             }
         });
+        if(map.get(p)){
+            holder.checkBox.setChecked(true);
+        }else {
+            holder.checkBox.setChecked(false);
+        }
     }
 
     public int getFrag() {
